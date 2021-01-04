@@ -56,7 +56,21 @@
     </build>
 
     <dependencies>
-	    <!-- Added some dependices to fix package javax.xml.bind does not exist see https://stackoverflow.com/questions/52502189/java-11-package-javax-xml-bind-does-not-exist -->
+	    <!-- MENNE: dependices for better crypto -->
+	    <!--  As of v1.0.4, libsodium-jna is in the maven central. -->
+	    <dependency>
+		    <groupId>com.muquit.libsodiumjna</groupId>
+		    <artifactId>libsodium-jna</artifactId>
+		    <version>1.0.4</version>
+	    </dependency>
+	    <!-- https://mvnrepository.com/artifact/net.java.dev.jna/jna -->
+	    <dependency>
+		    <groupId>net.java.dev.jna</groupId>
+		    <artifactId>jna</artifactId>
+		    <version>5.5.0</version>
+	    </dependency>
+	    <!-- MENNE: Added some dependices to fix package javax.xml.bind does not exist see https://stackoverflow.com/questions/52502189/java-11-package-javax-xml-bind-does-not-exist -->
+
 	    <dependency>
 		    <groupId>javax.xml.bind</groupId>
 		    <artifactId>jaxb-api</artifactId>
@@ -72,6 +86,7 @@
 		    <artifactId>jaxb-impl</artifactId>
 		    <version>2.3.0</version>
 	    </dependency>
+	    <!-- END MENNE -->    
 	    <!-- Guacamole Extension API -->
         <dependency>
             <groupId>org.apache.guacamole</groupId>

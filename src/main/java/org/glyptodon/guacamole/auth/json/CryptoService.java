@@ -36,6 +36,10 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import org.apache.guacamole.GuacamoleException;
 import org.apache.guacamole.GuacamoleServerException;
+//MENNE: Added import of libsodium:
+//import com.muquit.libsodiumjna;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service for handling cryptography-related operations, such as decrypting
@@ -44,6 +48,39 @@ import org.apache.guacamole.GuacamoleServerException;
  * @author Michael Jumper
  */
 public class CryptoService {
+	//MENNE: Added librarypath
+	private final Logger logger = LoggerFactory.getLogger(CryptoService.class);
+	private static String libraryPath = null;
+	public CryptoService() {
+
+		if (Platform.isMac())
+		{
+			// MacOS
+			libraryPath = "/usr/local/lib/libsodium.dylib";
+			libraryPath = libraryPath;
+			logger.info("Library path in Mac: " + libraryPath);
+		}
+		else if (Platform.isWindows())
+		{
+			// Windows
+			libraryPath = "C:/libsodium/libsodium.dll";
+			logger.info("Library path in Windows: " + libraryPath);
+		}
+		else
+		{
+			// Linux
+			libraryPath = "/usr/local/lib/libsodium.so";
+			logger.info("Library path: " + libraryPath);
+		}
+
+		logger.info("loading libsodium...");
+		SodiumLibrary.setLibraryPath(libraryPath);
+		// To check the native library is actually loaded, print the version of 
+		// native sodium library
+		String v = SodiumLibrary.libsodiumVersionString();
+		logger.info("libsodium version: " + v);
+
+	}
 
     /**
      * The length of all signatures, in bytes.
