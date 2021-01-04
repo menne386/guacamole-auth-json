@@ -56,8 +56,23 @@
     </build>
 
     <dependencies>
-
-        <!-- Guacamole Extension API -->
+	    <!-- Added some dependices to fix package javax.xml.bind does not exist see https://stackoverflow.com/questions/52502189/java-11-package-javax-xml-bind-does-not-exist -->
+	    <dependency>
+		    <groupId>javax.xml.bind</groupId>
+		    <artifactId>jaxb-api</artifactId>
+		    <version>2.3.0</version>
+	    </dependency>
+	    <dependency>
+		    <groupId>com.sun.xml.bind</groupId>
+		    <artifactId>jaxb-core</artifactId>
+		    <version>2.3.0</version>
+	    </dependency>
+	    <dependency>
+		    <groupId>com.sun.xml.bind</groupId>
+		    <artifactId>jaxb-impl</artifactId>
+		    <version>2.3.0</version>
+	    </dependency>
+	    <!-- Guacamole Extension API -->
         <dependency>
             <groupId>org.apache.guacamole</groupId>
             <artifactId>guacamole-ext</artifactId>
