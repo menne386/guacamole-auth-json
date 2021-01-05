@@ -37,10 +37,12 @@ import javax.crypto.spec.SecretKeySpec;
 import org.apache.guacamole.GuacamoleException;
 import org.apache.guacamole.GuacamoleServerException;
 //MENNE: Added import of libsodium:
-//import com.muquit.libsodiumjna;
+import com.muquit.libsodiumjna.SodiumLibrary;
+import com.muquit.libsodiumjna.exceptions.SodiumLibraryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import com.sun.jna.Platform; 
+import java.io.UnsupportedEncodingException; 
 /**
  * Service for handling cryptography-related operations, such as decrypting
  * encrypted data.
@@ -80,6 +82,15 @@ public class CryptoService {
 		String v = SodiumLibrary.libsodiumVersionString();
 		logger.info("libsodium version: " + v);
 
+	}
+
+	public String boxOpen(byte[] cipherText,byte[] key) throws SodiumLibraryException, UnsupportedEncodingException {
+		int nonceBytesLength = SodiumLibrary.cryptoSecretBoxNonceBytes().intValue();
+		byte[] nonceBytes = new byte[nonceBytesLength];
+		System.arraycopy(cipherText,0,nonceBytes,0,nonceBytes.length);
+
+		byte[] decryptedMessageBytes = SodiumLibrary.cryptoSecretBoxOpenEasy(cipherText, nonceBytes, key);
+		return new String(decryptedMessageBytes, "UTF-8");
 	}
 
     /**
