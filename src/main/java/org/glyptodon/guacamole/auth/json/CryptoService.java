@@ -19,7 +19,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package org.glyptodon.guacamole.auth.json;
 
 import java.security.InvalidAlgorithmParameterException;
@@ -41,8 +40,9 @@ import com.muquit.libsodiumjna.SodiumLibrary;
 import com.muquit.libsodiumjna.exceptions.SodiumLibraryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.sun.jna.Platform; 
-import java.io.UnsupportedEncodingException; 
+import com.sun.jna.Platform;
+import java.io.UnsupportedEncodingException;
+
 /**
  * Service for handling cryptography-related operations, such as decrypting
  * encrypted data.
@@ -50,26 +50,21 @@ import java.io.UnsupportedEncodingException;
  * @author Michael Jumper
  */
 public class CryptoService {
+
 	//MENNE: Added librarypath
 	private final Logger logger = LoggerFactory.getLogger(CryptoService.class);
 	private static String libraryPath = null;
-	public CryptoService() {
 
-		if (Platform.isMac())
-		{
+	public CryptoService() {
+		if (Platform.isMac()) {
 			// MacOS
 			libraryPath = "/usr/local/lib/libsodium.dylib";
-			libraryPath = libraryPath;
 			logger.info("Library path in Mac: " + libraryPath);
-		}
-		else if (Platform.isWindows())
-		{
+		} else if (Platform.isWindows()) {
 			// Windows
 			libraryPath = "C:/libsodium/libsodium.dll";
 			logger.info("Library path in Windows: " + libraryPath);
-		}
-		else
-		{
+		} else {
 			// Linux
 			libraryPath = "/usr/local/lib/libsodium.so";
 			logger.info("Library path: " + libraryPath);
@@ -81,188 +76,164 @@ public class CryptoService {
 		// native sodium library
 		String v = SodiumLibrary.libsodiumVersionString();
 		logger.info("libsodium version: " + v);
-
 	}
 
-	public String boxOpen(byte[] cipherText,byte[] key) throws SodiumLibraryException, UnsupportedEncodingException {
+	public String boxOpen(byte[] cipherText, byte[] key) throws SodiumLibraryException, UnsupportedEncodingException {
 		int nonceBytesLength = SodiumLibrary.cryptoSecretBoxNonceBytes().intValue();
 		byte[] nonceBytes = new byte[nonceBytesLength];
-		System.arraycopy(cipherText,0,nonceBytes,0,nonceBytes.length);
+		System.arraycopy(cipherText, 0, nonceBytes, 0, nonceBytes.length);
 
 		byte[] decryptedMessageBytes = SodiumLibrary.cryptoSecretBoxOpenEasy(cipherText, nonceBytes, key);
 		return new String(decryptedMessageBytes, "UTF-8");
 	}
 
-    /**
-     * The length of all signatures, in bytes.
-     */
-    public static final int SIGNATURE_LENGTH = 32;
+	/**
+	 * The length of all signatures, in bytes.
+	 */
+	public static final int SIGNATURE_LENGTH = 32;
 
-    /**
-     * The name of the key generation algorithm used for decryption.
-     */
-    private static final String DECRYPTION_KEY_GENERATION_ALGORITHM_NAME = "AES";
+	/**
+	 * The name of the key generation algorithm used for decryption.
+	 */
+	private static final String DECRYPTION_KEY_GENERATION_ALGORITHM_NAME = "AES";
 
-    /**
-     * The name of the cipher transformation that should be used to decrypt any
-     * String provided to decrypt().
-     */
-    private static final String DECRYPTION_CIPHER_NAME = "AES/CBC/PKCS5Padding";
+	/**
+	 * The name of the cipher transformation that should be used to decrypt any
+	 * String provided to decrypt().
+	 */
+	private static final String DECRYPTION_CIPHER_NAME = "AES/CBC/PKCS5Padding";
 
-    /**
-     * The name of the key generation algorithm used for verifying signatures.
-     */
-    private static final String SIGNATURE_KEY_GENERATION_ALGORITHM_NAME = "HmacSHA256";
+	/**
+	 * The name of the key generation algorithm used for verifying signatures.
+	 */
+	private static final String SIGNATURE_KEY_GENERATION_ALGORITHM_NAME = "HmacSHA256";
 
-    /**
-     * The name of the MAC algorithm used for verifying signatures.
-     */
-    private static final String SIGNATURE_MAC_ALGORITHM_NAME = "HmacSHA256";
+	/**
+	 * The name of the MAC algorithm used for verifying signatures.
+	 */
+	private static final String SIGNATURE_MAC_ALGORITHM_NAME = "HmacSHA256";
 
-    /**
-     * IV which is all null bytes (all binary zeroes). Usually, using a null IV
-     * is a horrible idea. As our plaintext will always be prepended with the
-     * HMAC signature of the rest of the message, we are effectively using the
-     * HMAC signature itself as the IV. For our purposes, where the encrypted
-     * value becomes an authentication token, this is OK.
-     */
-    private static final IvParameterSpec NULL_IV = new IvParameterSpec(new byte[] {
-        0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0
-    });
+	/**
+	 * IV which is all null bytes (all binary zeroes). Usually, using a null IV is
+	 * a horrible idea. As our plaintext will always be prepended with the HMAC
+	 * signature of the rest of the message, we are effectively using the HMAC
+	 * signature itself as the IV. For our purposes, where the encrypted value
+	 * becomes an authentication token, this is OK.
+	 */
+	private static final IvParameterSpec NULL_IV = new IvParameterSpec(new byte[]{
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0
+	});
 
-    /**
-     * Creates a new key suitable for decryption using the provided raw key
-     * bytes. The algorithm used to generate this key is dictated by
-     * DECRYPTION_KEY_GENERATION_ALGORITHM_NAME and must match the algorithm
-     * used by decrypt().
-     *
-     * @param keyBytes
-     *     The raw bytes from which the encryption/decryption key should be
-     *     generated.
-     *
-     * @return
-     *     A new key suitable for encryption or decryption, generated from the
-     *     given bytes.
-     */
-    public SecretKey createEncryptionKey(byte[] keyBytes) {
-        return new SecretKeySpec(keyBytes, DECRYPTION_KEY_GENERATION_ALGORITHM_NAME);
-    }
+	/**
+	 * Creates a new key suitable for decryption using the provided raw key bytes.
+	 * The algorithm used to generate this key is dictated by
+	 * DECRYPTION_KEY_GENERATION_ALGORITHM_NAME and must match the algorithm used
+	 * by decrypt().
+	 *
+	 * @param keyBytes The raw bytes from which the encryption/decryption key
+	 * should be generated.
+	 *
+	 * @return A new key suitable for encryption or decryption, generated from the
+	 * given bytes.
+	 */
+	public SecretKey createEncryptionKey(byte[] keyBytes) {
+		return new SecretKeySpec(keyBytes, DECRYPTION_KEY_GENERATION_ALGORITHM_NAME);
+	}
 
-    /**
-     * Creates a new key suitable for signature verification using the provided
-     * raw key bytes. The algorithm used to generate this key is dictated by
-     * SIGNATURE_KEY_GENERATION_ALGORITHM_NAME and must match the algorithm
-     * used by sign().
-     *
-     * @param keyBytes
-     *     The raw bytes from which the signature verification key should be
-     *     generated.
-     *
-     * @return
-     *     A new key suitable for signature verification, generated from the
-     *     given bytes.
-     */
-    public SecretKey createSignatureKey(byte[] keyBytes) {
-        return new SecretKeySpec(keyBytes, SIGNATURE_KEY_GENERATION_ALGORITHM_NAME);
-    }
+	/**
+	 * Creates a new key suitable for signature verification using the provided
+	 * raw key bytes. The algorithm used to generate this key is dictated by
+	 * SIGNATURE_KEY_GENERATION_ALGORITHM_NAME and must match the algorithm used
+	 * by sign().
+	 *
+	 * @param keyBytes The raw bytes from which the signature verification key
+	 * should be generated.
+	 *
+	 * @return A new key suitable for signature verification, generated from the
+	 * given bytes.
+	 */
+	public SecretKey createSignatureKey(byte[] keyBytes) {
+		return new SecretKeySpec(keyBytes, SIGNATURE_KEY_GENERATION_ALGORITHM_NAME);
+	}
 
-    /**
-     * Decrypts the given ciphertext using the provided key, returning the
-     * resulting plaintext. If any error occurs during decryption at all, a
-     * GuacamoleException is thrown. The IV used for the decryption process is
-     * a null IV (all binary zeroes).
-     *
-     * @param key
-     *     The key to use to decrypt the provided ciphertext.
-     *
-     * @param cipherText
-     *     The ciphertext to decrypt.
-     *
-     * @return
-     *     The plaintext which results from decrypting the ciphertext with the
-     *     provided key.
-     *
-     * @throws GuacamoleException
-     *     If any error at all occurs during decryption.
-     */
-    public byte[] decrypt(Key key, byte[] cipherText) throws GuacamoleException {
+	/**
+	 * Decrypts the given ciphertext using the provided key, returning the
+	 * resulting plaintext. If any error occurs during decryption at all, a
+	 * GuacamoleException is thrown. The IV used for the decryption process is a
+	 * null IV (all binary zeroes).
+	 *
+	 * @param key The key to use to decrypt the provided ciphertext.
+	 *
+	 * @param cipherText The ciphertext to decrypt.
+	 *
+	 * @return The plaintext which results from decrypting the ciphertext with the
+	 * provided key.
+	 *
+	 * @throws GuacamoleException If any error at all occurs during decryption.
+	 */
+	public byte[] decrypt(Key key, byte[] cipherText) throws GuacamoleException {
 
-        try {
+		try {
 
-            // Init cipher for descryption using secret key
-            Cipher cipher = Cipher.getInstance(DECRYPTION_CIPHER_NAME);
-            cipher.init(Cipher.DECRYPT_MODE, key, NULL_IV);
+			// Init cipher for descryption using secret key
+			Cipher cipher = Cipher.getInstance(DECRYPTION_CIPHER_NAME);
+			cipher.init(Cipher.DECRYPT_MODE, key, NULL_IV);
 
-            // Perform decryption
-            return cipher.doFinal(cipherText);
+			// Perform decryption
+			return cipher.doFinal(cipherText);
 
-        }
+		} // Rethrow all decryption failures identically
+		catch (InvalidAlgorithmParameterException e) {
+			throw new GuacamoleServerException(e);
+		} catch (NoSuchAlgorithmException e) {
+			throw new GuacamoleServerException(e);
+		} catch (NoSuchPaddingException e) {
+			throw new GuacamoleServerException(e);
+		} catch (InvalidKeyException e) {
+			throw new GuacamoleServerException(e);
+		} catch (IllegalBlockSizeException e) {
+			throw new GuacamoleServerException(e);
+		} catch (BadPaddingException e) {
+			throw new GuacamoleServerException(e);
+		}
 
-        // Rethrow all decryption failures identically
-        catch (InvalidAlgorithmParameterException e) {
-            throw new GuacamoleServerException(e);
-        }
-        catch (NoSuchAlgorithmException e) {
-            throw new GuacamoleServerException(e);
-        }
-        catch (NoSuchPaddingException e) {
-            throw new GuacamoleServerException(e);
-        }
-        catch (InvalidKeyException e) {
-            throw new GuacamoleServerException(e);
-        }
-        catch (IllegalBlockSizeException e) {
-            throw new GuacamoleServerException(e);
-        }
-        catch (BadPaddingException e) {
-            throw new GuacamoleServerException(e);
-        }
+	}
 
-    }
+	/**
+	 * Signs the given arbitrary data using the provided key, returning the
+	 * resulting signature. If any error occurs during signing at all, a
+	 * GuacamoleException is thrown.
+	 *
+	 * @param key The key to use to sign the provided data.
+	 *
+	 * @param data The arbitrary data to sign.
+	 *
+	 * @return The signature which results from signing the arbitrary data with
+	 * the provided key.
+	 *
+	 * @throws GuacamoleException If any error at all occurs during signing.
+	 */
+	public byte[] sign(Key key, byte[] data) throws GuacamoleException {
 
-    /**
-     * Signs the given arbitrary data using the provided key, returning the
-     * resulting signature. If any error occurs during signing at all, a
-     * GuacamoleException is thrown.
-     *
-     * @param key
-     *     The key to use to sign the provided data.
-     *
-     * @param data
-     *     The arbitrary data to sign.
-     *
-     * @return
-     *     The signature which results from signing the arbitrary data with the
-     *     provided key.
-     *
-     * @throws GuacamoleException
-     *     If any error at all occurs during signing.
-     */
-    public byte[] sign(Key key, byte[] data) throws GuacamoleException {
+		try {
 
-        try {
+			// Init MAC for signing using secret key
+			Mac mac = Mac.getInstance(SIGNATURE_MAC_ALGORITHM_NAME);
+			mac.init(key);
 
-            // Init MAC for signing using secret key
-            Mac mac = Mac.getInstance(SIGNATURE_MAC_ALGORITHM_NAME);
-            mac.init(key);
+			// Sign provided data
+			return mac.doFinal(data);
 
-            // Sign provided data
-            return mac.doFinal(data);
+		} // Rethrow all signature failures identically
+		catch (NoSuchAlgorithmException e) {
+			throw new GuacamoleServerException(e);
+		} catch (InvalidKeyException e) {
+			throw new GuacamoleServerException(e);
+		} catch (IllegalStateException e) {
+			throw new GuacamoleServerException(e);
+		}
 
-        }
-
-        // Rethrow all signature failures identically
-        catch (NoSuchAlgorithmException e) {
-            throw new GuacamoleServerException(e);
-        }
-        catch (InvalidKeyException e) {
-            throw new GuacamoleServerException(e);
-        }
-        catch (IllegalStateException e) {
-            throw new GuacamoleServerException(e);
-        }
-
-    }
+	}
 
 }

@@ -19,7 +19,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package org.glyptodon.guacamole.auth.json;
 
 import com.google.inject.Inject;
@@ -36,69 +35,65 @@ import org.apache.guacamole.environment.Environment;
  */
 public class ConfigurationService {
 
-    /**
-     * The Guacamole server environment.
-     */
-    @Inject
-    private Environment environment;
+	/**
+	 * The Guacamole server environment.
+	 */
+	@Inject
+	private Environment environment;
 
-    /**
-     * The encryption key to use for all decryption and signature verification.
-     */
-    private static final ByteArrayProperty JSON_SECRET_KEY = new ByteArrayProperty() {
+	/**
+	 * The encryption key to use for all decryption and signature verification.
+	 */
+	private static final ByteArrayProperty JSON_SECRET_KEY = new ByteArrayProperty() {
 
-        @Override
-        public String getName() {
-            return "json-secret-key";
-        }
+		@Override
+		public String getName() {
+			return "json-secret-key";
+		}
 
-    };
+	};
 
-    /**
-     * A comma-separated list of all IP addresses or CIDR subnets which should
-     * be allowed to perform authentication. If not specified, ALL address will
-     * be allowed.
-     */
-    private static final StringListProperty JSON_TRUSTED_NETWORKS = new StringListProperty() {
+	/**
+	 * A comma-separated list of all IP addresses or CIDR subnets which should be
+	 * allowed to perform authentication. If not specified, ALL address will be
+	 * allowed.
+	 */
+	private static final StringListProperty JSON_TRUSTED_NETWORKS = new StringListProperty() {
 
-        @Override
-        public String getName() {
-            return "json-trusted-networks";
-        }
+		@Override
+		public String getName() {
+			return "json-trusted-networks";
+		}
 
-    };
+	};
 
-    /**
-     * Returns the symmetric key which will be used to encrypt and sign all
-     * JSON data and should be used to decrypt and verify any received JSON
-     * data. This is dictated by the "json-secret-key" property specified
-     * within guacamole.properties.
-     *
-     * @return
-     *     The key which should be used to decrypt received JSON data.
-     *
-     * @throws GuacamoleException
-     *     If guacamole.properties cannot be parsed, or if the
-     *     "json-secret-key" property is missing.
-     */
-    public byte[] getSecretKey() throws GuacamoleException {
-        return environment.getRequiredProperty(JSON_SECRET_KEY);
-    }
+	/**
+	 * Returns the symmetric key which will be used to encrypt and sign all JSON
+	 * data and should be used to decrypt and verify any received JSON data. This
+	 * is dictated by the "json-secret-key" property specified within
+	 * guacamole.properties.
+	 *
+	 * @return The key which should be used to decrypt received JSON data.
+	 *
+	 * @throws GuacamoleException If guacamole.properties cannot be parsed, or if
+	 * the "json-secret-key" property is missing.
+	 */
+	public byte[] getSecretKey() throws GuacamoleException {
+		return environment.getRequiredProperty(JSON_SECRET_KEY);
+	}
 
-    /**
-     * Returns a collection of all IP address or CIDR subnets which should be
-     * allowed to submit authentication requests. If empty, authentication
-     * attempts will be allowed through without restriction.
-     *
-     * @return
-     *     A collection of all IP address or CIDR subnets which should be
-     *     allowed to submit authentication requests.
-     *
-     * @throws GuacamoleException
-     *     If guacamole.properties cannot be parsed.
-     */
-    public Collection<String> getTrustedNetworks() throws GuacamoleException {
-        return environment.getProperty(JSON_TRUSTED_NETWORKS, Collections.<String>emptyList());
-    }
+	/**
+	 * Returns a collection of all IP address or CIDR subnets which should be
+	 * allowed to submit authentication requests. If empty, authentication
+	 * attempts will be allowed through without restriction.
+	 *
+	 * @return A collection of all IP address or CIDR subnets which should be
+	 * allowed to submit authentication requests.
+	 *
+	 * @throws GuacamoleException If guacamole.properties cannot be parsed.
+	 */
+	public Collection<String> getTrustedNetworks() throws GuacamoleException {
+		return environment.getProperty(JSON_TRUSTED_NETWORKS, Collections.<String>emptyList());
+	}
 
 }
